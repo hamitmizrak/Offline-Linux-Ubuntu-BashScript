@@ -193,8 +193,8 @@ packageInstall() {
         echo -e "######### Monitoring  #########\n"
         sudo apt install htop iftop net-tools -y
 
-        echo -e "######### Python  #########\n"
-        sudo apt install python3 python3-pip -y
+        #echo -e "######### Python  #########\n"
+        #sudo apt install python3 python3-pip -y
     else
         echo -e "Sistem İçin Genel Paket Yüklemesi Yapılmadı..."
     fi
