@@ -37,48 +37,38 @@ updated() {
             read -p "Sistemin Listesini Güncellemek İstiyor musunuz ? e/h " listUpdatedResult
             if [[ $listUpdatedResult == "e" || $listUpdatedResult == "E" ]]; then
                 echo -e "List Güncelleme Başladı ..."
-
-                # Geri Sayım
-                ./countdown.sh
-
-                # Güncelleme
+                sudo ./countdown.sh
                 sudo apt-get update
             else
-                echo -e "Güncelleme yapılmadı"
+                echo -e "Sistemin Listesini Güncellenemesi yapılmadı"
             fi
             ;; 
         2)
             read -p "Sistemin Paketini Yükseltmek İstiyor musunuz ? e/h " systemListUpdatedResult
             if [[ $systemListUpdatedResult == "e" || $systemListUpdatedResult == "E" ]]; then
-                echo -e "Kernel Güncelleme Başladı ..."
-
-                # Geri Sayım
-                ./countdown.sh
-
-                # Güncelleme
+                echo -e "Sistem Paket Güncellenmesi Başladı ..."
+                sudo ./countdown.sh
                 sudo apt-get update && sudo apt-get upgrade -y
             else
-                echo -e "Güncelleme yapılmadı"
+                echo -e "Sistem Paket Güncellenmesi  yapılmadı..."
             fi
             ;; 
         3)
             read -p "Sistemin Çekirdeğini Güncellemek İstiyor musunuz ? e/h " kernelUpdatedResult
             if [[ $kernelUpdatedResult == "e" || $kernelUpdatedResult == "E" ]]; then
                 echo -e "Kernel Güncelleme Başladı ..."
-
-                # Geri Sayım
-                ./countdown.sh
-
-                # Güncelleme
+                sudo ./countdown.sh
                 sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y
                 # Çekirdek(Kernel) güncellemelerinde yeniden başlamak gerekebilir
                 sudo apt list --upgradable | grep linux-image
             else
-                echo -e "Güncelleme yapılmadı"
+                echo -e "Kernel Güncellemesi Yapılmadı..."
             fi
             ;;
         *)
             echo -e "Lütfen sadece size belirtilen seçeneği seçiniz"
+            ;;
+    esac
 }
 updated
 
@@ -93,7 +83,7 @@ logout() {
         echo -e "Sitem Kapatılıyor ..."
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         # Update
         sudo apt update
@@ -107,6 +97,134 @@ logout() {
 
 ###################################################################
 ###################################################################
+# Paket Yüklendi mi
+is_loading_package() {
+    sleep 2
+    echo -e "\n###### ${PACKAGE} ######  "
+    read -p "Paketin Yüklendiğini Öğrenmek İster misiniz ? e/h " packageResult
+    if [[ $packageResult == "e" || $packageResult == "E" ]]; then
+        echo -e "Yüklenmiş paket bilgisini öğrenme ..."
+
+        # Geri Sayım
+        sudo ./countdown.sh
+
+        echo -e "Bulunduğum dizin => $(pwd)\n"
+        sleep 1
+
+        echo -e "######### Paket Bağımlılığı #########\n"
+        read -p "Lütfen yüklenmiş paket adını giriniz examples: git: " user_input
+
+        # dependency
+        package_information "$user_input"
+    else
+        echo -e "Paket Yüklenme Bilgisi İstenmedi..."
+    fi
+}
+
+package_information() {
+    # parametre - arguman
+    local packagename=$1
+
+    # Belirli bir Komutun Yolu (Sistemde nerede olduğunu bulmak)
+    which $packagename
+
+    # İlgili Paketi bulma
+    whereis $packagename
+
+    # Paket Bilgilerini Görüntüleme
+    apt-cache show $packagename
+
+    # Paketin Yüklü olup olmadığını Kontrol Etmek
+    dpkg-query -W -f='${Status} ${Package}\n' $packagename
+
+    # Geri Sayım
+    sudo ./countdown.sh
+
+    # Yüklü Tüm paketleri Listele
+    dpkg -l 
+
+    # Geri Sayım
+    sudo ./countdown.sh
+
+    # Eğer paket isimleri uzunsa grep ile arama yap 
+    dpkg -l | grep $packagename
+
+    # Dosyalarını Listelemek İstersem
+    dpkg -L $packagename
+
+    ############
+    # Yüklü Tüm Paketleri Listelemek
+    apt list --installed
+
+    # Belirli bir paketin yüklü olup olmadığını kontrol etmek
+    apt list --installed | grep $packagename 
+}
+
+###################################################################
+###################################################################
+# Paket Bağımlıklarını Görme
+check_package() {
+    sleep 2
+    echo -e "\n###### ${CHECK} ######  "
+    read -p "Sistem İçin Genel Bağımlılık Paketini Yüklemek İstiyor musunuz ? e/h " checkResult
+    if [[ $checkResult == "e" || $checkResult == "E" ]]; then
+        echo -e "Yüklenecek Paket Bağımlılığı ..."
+
+        # Geri Sayım
+        sudo ./countdown.sh
+
+        echo -e "Bulunduğum dizin => $(pwd)\n"
+        sleep 1
+
+        echo -e "######### Paket Bağımlılığı #########\n"
+        read -p "Lütfen yüklemek istediğiniz paket adını yazınız examples: nginx: " user_input
+
+        # dependency
+        dependency "$user_input"
+    else
+        echo -e "Bağımlılıklar kontrol edilmedi ..."
+    fi
+}
+
+dependency() {
+    # parametre - arguman
+    local packagename=$1
+    #
+    sudo apt-get check
+    sudo apt-cache depends $packagename
+    sudo apt-get install $packagename
+}
+
+
+
+###################################################################
+###################################################################
+# Clean
+# Install
+clean() {
+    sleep 2
+    echo -e "\n###### ${CLEANER} ######  "
+    read -p "Sistemde Gereksiz Paketleri Temizlemek İster misiniz ? e/h " cleanResult
+    if [[ $cleanResult == "e" || $cleanResult == "E" ]]; then
+        echo -e "Gereksiz Paket Temizliği Başladı ..."
+
+        # Geri Sayım
+        sudo ./countdown.sh
+
+        echo -e "######### nginx #########\n"
+        sudo apt-get autoremove -y
+        sudo apt autoclean
+        echo -e "Kırık Bağımlılıkları Yükle ..."
+        sudo apt install -f
+    else
+        echo -e "Güncelleme yapılmadı"
+    fi
+}
+clean
+
+
+###################################################################
+###################################################################
 # Git Packet Install
 # Install
 gitInstall() {
@@ -114,7 +232,7 @@ gitInstall() {
     updated
 
     # Geri Sayım
-    ./countdown.sh
+    sudo ./countdown.sh
 
     echo -e "\n###### ${INSTALL} ######  "
     read -p "Git Paketini Yüklemek İstiyor musunuz ? e/h " gitInstallResult
@@ -122,7 +240,7 @@ gitInstall() {
         echo -e "Git Paket Yükleme Başladı ..."
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         echo -e "Bulunduğum dizin => $(pwd)\n"
         sleep 1
@@ -136,7 +254,7 @@ gitInstall() {
         git config --global -l
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         echo -e "######### Git Version #########\n"
         git --version
@@ -165,7 +283,7 @@ vsCodeInstall() {
     updated
 
     # Geri Sayım
-    ./countdown.sh
+    sudo ./countdown.sh
 
     echo -e "\n###### ${INSTALL} ######  "
     read -p "VS Code Paketini Yüklemek İstiyor musunuz ? e/h " vscodeInstallResult
@@ -173,7 +291,7 @@ vsCodeInstall() {
         echo -e "VS Code Paket Yükleme Başladı ..."
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         echo -e "Bulunduğum dizin => $(pwd)\n"
         sleep 1
@@ -211,7 +329,7 @@ jdkInstall() {
     updated
 
     # Geri Sayım
-    ./countdown.sh
+    sudo ./countdown.sh
 
     echo -e "\n###### ${INSTALL} ######  "
     read -p "JDK Paketini Yüklemek İstiyor musunuz ? e/h " jdkInstallResult
@@ -219,7 +337,7 @@ jdkInstall() {
         echo -e "JDK Paket Yükleme Başladı ..."
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         echo -e "Bulunduğum dizin => $(pwd)\n"
         sleep 1
@@ -233,7 +351,7 @@ jdkInstall() {
         #sudo update-alternative --config java
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         echo -e "######### Git Version #########\n"
         which git
@@ -264,7 +382,7 @@ mavenInstall() {
     updated
 
     # Geri Sayım
-    ./countdown.sh
+    sudo ./countdown.sh
 
     echo -e "\n###### ${INSTALL} ######  "
     read -p "MAVEN Paketini Yüklemek İstiyor musunuz ? e/h " mavenInstallResult
@@ -272,7 +390,7 @@ mavenInstall() {
         echo -e "MAVEN Paket Yükleme Başladı ..."
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         echo -e "Bulunduğum dizin => $(pwd)\n"
         sleep 1
@@ -284,13 +402,13 @@ mavenInstall() {
         #sudo update-alternative --config java
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         # Maven Yükle
         sudo apt install maven 
         
          # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         echo -e "######### Version #########\n"
         which git
@@ -324,7 +442,7 @@ apacheTomcatInstall() {
     updated
 
     # Geri Sayım
-    ./countdown.sh
+    sudo ./countdown.sh
 
     echo -e "\n###### ${INSTALL} ######  "
     read -p "APACHE TOMCAT Paketini Yüklemek İstiyor musunuz ? e/h " apacheTomcatInstallResult
@@ -332,7 +450,7 @@ apacheTomcatInstall() {
         echo -e "APACHE TOMCAT Paket Yükleme Başladı ..."
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         echo -e "Bulunduğum dizin => $(pwd)\n"
         sleep 1
@@ -346,7 +464,7 @@ apacheTomcatInstall() {
         #sudo update-alternative --config java
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         # Apache Tomcat Yükle
         # Tomcat 10 için En az JDK 11 kurmalısınız
@@ -360,7 +478,7 @@ apacheTomcatInstall() {
         sudo chmod -R 755 /opt/tomcat/
         
          # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         # Tomcat Servisi Başlatma Ve Etkinleştirme
         sudo systemctl daemon-reload
@@ -411,7 +529,7 @@ dockerInstall() {
     updated
 
     # Geri Sayım
-    ./countdown.sh
+    sudo ./countdown.sh
 
     echo -e "\n###### ${INSTALL} ######  "
     read -p "DOCKER Paketini Yüklemek İstiyor musunuz ? e/h " dockerInstallResult
@@ -419,7 +537,7 @@ dockerInstall() {
         echo -e "Docker Paket Yükleme Başladı ..."
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         echo -e "Bulunduğum dizin => $(pwd)\n"
         sleep 1
@@ -433,7 +551,7 @@ dockerInstall() {
         #sudo update-alternative --config java
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         # Docker Kurulumu
          # Eğer önceden Docker varsa sil
@@ -479,7 +597,7 @@ dockerInstall() {
         docker run hello-world
         
          # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         # Docker Pulling
         dockerPulling
@@ -523,7 +641,7 @@ dockerInstall
 # Docker Pulling
 dockerPulling() {
      # Geri Sayım
-    ./countdown.sh
+    sudo ./countdown.sh
 
     echo -e "\n### ${DOCKER_PULL} ###"
     read -p "\nDockerHub'a Pull  yapmak istiyor musunuz ? E/H? " updatedResult
@@ -551,7 +669,7 @@ dockerPulling() {
 # dockerHubLogin
 dockerHubLogin() {
     # Geri Sayım
-    ./countdown.sh
+    sudo ./countdown.sh
 
     echo -e "\n### ${LOGIN} ###"
     read -p "\nDockerHub'a Giriş yapmak istiyor musunuz ? E/H? " updatedResult
@@ -567,7 +685,7 @@ dockerHubLogin() {
 # dockerHubLogout
 dockerHubLogout() {
     # Geri Sayım
-    ./countdown.sh
+    sudo ./countdown.sh
 
     echo -e "\n### ${LOGOUT} ###"
     read -p "\nDockerHub'a Çıkış yapmak istiyor musunuz ? E/H? " updatedResult
@@ -583,7 +701,7 @@ dockerHubLogout() {
 # Docker Portainer
 dockerPortainer(){
     # Geri Sayım
-    ./countdown.sh
+    sudo ./countdown.sh
 
     echo -e "\n### ${PORTAINER} ###"
     read -p "\nDockerHub'a Çıkış yapmak istiyor musunuz ? E/H? " portainerResult
@@ -617,7 +735,7 @@ dockerPortainer(){
 # Docker Compose
 dockerCompose(){
     # Geri Sayım
-    ./countdown.sh
+    sudo ./countdown.sh
 
     echo -e "\n### ${DOCKERCOMPOSE} ###"
     read -p "\nDocker Compose Eklemek İstiyor musunuz ? E/H? " dockerComposeResult
@@ -630,107 +748,6 @@ dockerCompose(){
     fi
 }
 
-###################################################################
-###################################################################
-###################################################################
-###################################################################
-# Paket Yüklendi mi
-is_loading_package() {
-    sleep 2
-    echo -e "\n###### ${PACKAGE} ######  "
-    read -p "Paketin Yüklendiğini Öğrenmek İster misiniz ? e/h " packageResult
-    if [[ $packageResult == "e" || $packageResult == "E" ]]; then
-        echo -e "Yüklenmiş paket bilgisini öğrenme ..."
-
-        # Geri Sayım
-        ./countdown.sh
-
-        echo -e "Bulunduğum dizin => $(pwd)\n"
-        sleep 1
-
-        echo -e "######### Paket Bağımlılığı #########\n"
-        read -p "Lütfen yüklenmiş paket adını giriniz examples: git" user_input
-
-        # dependency
-        package_information "$user_input"
-    else
-        echo -e "Paket Yüklenme Bilgisi İstenmedi..."
-    fi
-}
-
-package_information() {
-    # parametre - arguman
-    local packagename=$1
-
-    # Belirli bir Komutun Yolu (Sistemde nerede olduğunu bulmak)
-    which $packagename
-
-    # İlgili Paketi bulma
-    whereis $packagename
-
-    # Paket Bilgilerini Görüntüleme
-    apt-cache show $packagename
-
-    # Paketin Yüklü olup olmadığını Kontrol Etmek
-    dpkg-query -W -f='${Status} ${Package}\n' $packagename
-
-    # Geri Sayım
-    ./countdown.sh
-
-    # Yüklü Tüm paketleri Listele
-    dpkg -l 
-
-    # Geri Sayım
-    ./countdown.sh
-
-    # Eğer paket isimleri uzunsa grep ile arama yap 
-    dpkg -l | grep $packagename
-
-    # Dosyalarını Listelemek İstersem
-    dpkg -L $packagename
-
-    ############
-    # Yüklü Tüm Paketleri Listelemek
-    apt list --installed
-
-    # Belirli bir paketin yüklü olup olmadığını kontrol etmek
-    apt list --installed | grep $packagename 
-}
-
-###################################################################
-###################################################################
-# Paket Bağımlıklarını Görme
-check_package() {
-    sleep 2
-    echo -e "\n###### ${CHECK} ######  "
-    read -p "Sistem İçin Genel Bağımlılık Paketini Yüklemek İstiyor musunuz ? e/h " checkResult
-    if [[ $checkResult == "e" || $checkResult == "E" ]]; then
-        echo -e "Yüklenecek Paket Bağımlılığı ..."
-
-        # Geri Sayım
-        ./countdown.sh
-
-        echo -e "Bulunduğum dizin => $(pwd)\n"
-        sleep 1
-
-        echo -e "######### Paket Bağımlılığı #########\n"
-        read -p "Lütfen yüklemek istediğiniz paket adını yazınız examples: nginx" user_input
-
-        # dependency
-        dependency "$user_input"
-    else
-        echo -e "Bağımlılıklar kontrol edilmedi ..."
-    fi
-}
-
-dependency() {
-    # parametre - arguman
-    local packagename=$1
-    #
-    sudo apt-get check
-    sudo apt-cache depends $packagename
-    sudo apt-get install $packagename
-}
 
 ###################################################################
 ###################################################################
@@ -743,7 +760,7 @@ information() {
         echo -e "Genel Bilgiler Verilmeye Başlandı ..."
 
         # Geri Sayım
-        ./countdown.sh
+        sudo ./countdown.sh
 
         #sudo su
         echo -e "Ben Kimim => $(whoami)\n"
@@ -768,30 +785,7 @@ information() {
 }
 information
 
-###################################################################
-###################################################################
-# Clean
-# Install
-clean() {
-    sleep 2
-    echo -e "\n###### ${CLEANER} ######  "
-    read -p "Sistemde Gereksiz Paketleri Temizlemek İster misiniz ? e/h " cleanResult
-    if [[ $cleanResult == "e" || $cleanResult == "E" ]]; then
-        echo -e "Gereksiz Paket Temizliği Başladı ..."
 
-        # Geri Sayım
-        ./countdown.sh
-
-        echo -e "######### nginx #########\n"
-        sudo apt-get autoremove -y
-        sudo apt autoclean
-        echo -e "Kırık Bağımlılıkları Yükle ..."
-        sudo apt install -f
-    else
-        echo -e "Güncelleme yapılmadı"
-    fi
-}
-clean
 
 ###################################################################
 ###################################################################
