@@ -46,6 +46,8 @@ accessPermission() {
         sudo chmod +x countdown.sh
         sudo chmod +x reboot.sh
         sudo chmod +x _2_other_programming.sh
+        sudo chmod +x _2_other_programming.sh
+        sudo chmod +x docker_tomcat.sh
     else
         echo -e "Dosya İzinleri Yapılmadı..."
     fi
@@ -259,7 +261,7 @@ theFirewallInstall() {
         sudo ufw allow 22
         sudo ufw allow 80
         sudo ufw allow 443
-        sudo ufw allow 1111
+        sudo ufw allow 1111 # Apache Tomcat - Docker 
         sudo ufw allow 2222 # docker portainer
         sudo ufw allow 8000 # docker portainer
         sudo ufw allow 3333
