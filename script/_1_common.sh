@@ -170,7 +170,7 @@ packageInstall() {
         ./countdown.sh
         echo -e "Bulunduğum dizin => $(pwd)\n"
         sleep 1
-        echo -e "######### nginx #########\n"
+        echo -e "######### Nginx #########\n"
         # Nginx Check Package dependency Fonksiyonunu çağır
         check_package
 
@@ -180,15 +180,15 @@ packageInstall() {
         sudo systemctl enable mginx
         ./countdown.sh
 
-        echo -e "######### nodejs #########\n"
-        sudo apt install nodejs -y
-        ./countdown.sh
+        #echo -e "######### nodejs #########\n"
+        #sudo apt install nodejs -y
+        #./countdown.sh
 
-        echo -e "######### Brute Force  #########\n"
-        sudo apt install fail2ban -y
-        sudo systemctl start fail2ban
-        sudo systemctl enable fail2ban
-        ./countdown.sh
+        #echo -e "######### Brute Force  #########\n"
+        #sudo apt install fail2ban -y
+        #sudo systemctl start fail2ban
+        #sudo systemctl enable fail2ban
+        #./countdown.sh
 
         echo -e "######### Monitoring  #########\n"
         sudo apt install htop iftop net-tools -y
