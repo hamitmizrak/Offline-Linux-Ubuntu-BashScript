@@ -28,7 +28,7 @@ updated() {
     echo -e "\n###### ${UPDATED} ######  "
     
     # Güncelleme Tercihi
-    echo -e "Güncelleme İçin Seçim Yapınız\n1-)update\n2-)upgrade\n3-)dist-upgrade"
+    echo -e "Güncelleme İçin Seçim Yapınız\n1-)update\n2-)upgrade\n3-)dist-upgrade\n4-)Çıkış"
     read chooise
 
     # Girilen sayıya göre tercih
@@ -195,8 +195,6 @@ dependency() {
     sudo apt-get install $packagename
 }
 
-
-
 ###################################################################
 ###################################################################
 # Clean
@@ -221,7 +219,6 @@ clean() {
     fi
 }
 clean
-
 
 ###################################################################
 ###################################################################
@@ -273,7 +270,6 @@ gitInstall() {
 }
 gitInstall
 
-
 ###################################################################
 ###################################################################
 # VS CODE Packet Install
@@ -318,7 +314,6 @@ vsCodeInstall() {
     fi
 }
 vsCodeInstall
-
 
 ###################################################################
 ###################################################################
@@ -807,6 +802,6 @@ portVersion() {
     /opt/tomcat/bin/catalina.sh version 
 
     # docker Version
-    docker-compose -v
+    #docker-compose -v
 }
 portVersion
