@@ -117,7 +117,7 @@ gitInstall() {
         # Paket Bağımlıklarını Görme
         check_package
     else
-        echo -e "Yükleme yapılmadı"
+        echo -e "Git Yükleme yapılmadı...."
     fi
 }
 gitInstall

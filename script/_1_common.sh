@@ -11,6 +11,7 @@ INFORMATION="Genel Bilgiler Ports | NETWORKING"
 UFW="Uncomplicated Firewall Ggüvenlik duvarı Yöentim Araçı"
 LOGOUT="Sistemi Tekrar Başlatmak"
 CHECK="Yüklencek Paket bağımlılıkları"
+TECH="Diğer Teknolojiler"
 
 ###################################################################
 ###################################################################
@@ -394,3 +395,24 @@ portVersion() {
     #docker-compose -v
 }
 portVersion
+
+
+###################################################################
+###################################################################
+# Clean
+# Install
+other_technology() {
+    ./countdown.sh
+    echo -e "\n###### ${TECH} ######  "
+    read -p "Sistem için Yüklemek İsteyeceğiniz Paketleri Yüklemek İster misiniz ? e/h " otherResult
+    if [[ $otherResult == "e" || $otherResult == "E" ]]; then
+        echo -e "Teknolojiler Yüklenmeye başlandı ..."
+        ./countdown.sh
+        echo -e "######### Teknolojiler #########\n"
+        ./_2_other_programming.sh
+       
+    else
+        echo -e "Teknolojiler Yüklenmeye başlanmadı ...."
+    fi
+}
+other_technology
