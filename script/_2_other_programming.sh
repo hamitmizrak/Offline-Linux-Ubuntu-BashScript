@@ -285,6 +285,90 @@ mavenInstall() {
         
          # Geri Sayım
         ./countdown.sh
+
+        echo -e "######### Version #########\n"
+        which git
+        which java
+        which maven
+        git --version
+        java --version
+        javac --version
+        mvn --version
+
+        # Clean Function
+        clean
+
+        # Yüklenen Paket Hakkında Bilgi Almak
+        is_loading_package
+
+        # VSCODE Check Package dependency Fonksiyonunu çağır
+        check_package
+    else
+        echo -e "Git Yükleme yapılmadı...."
+    fi
+}
+mavenInstall
+
+###################################################################
+###################################################################
+# Apache Tomcat Packet Install
+# Install
+apacheTomcatInstall() {
+
+     # Güncelleme Fonksiyonu
+    updated
+
+    # Geri Sayım
+    ./countdown.sh
+
+    echo -e "\n###### ${INSTALL} ######  "
+    read -p "APACHE TOMCAT Paketini Yüklemek İstiyor musunuz ? e/h " apacheTomcatInstallResult
+    if [[ $apacheTomcatInstallResult == "e" || $apacheTomcatInstallResult == "E" ]]; then
+        echo -e "APACHE TOMCAT Paket Yükleme Başladı ..."
+
+        # Geri Sayım
+        ./countdown.sh
+
+        echo -e "Bulunduğum dizin => $(pwd)\n"
+        sleep 1
+        echo -e "######### APACHE TOMCAT #########\n"
+
+        # Yükleme
+        java --version 
+        javac --version
+        mvn --version
+
+        #sudo update-alternative --config java
+
+        # Geri Sayım
+        ./countdown.sh
+
+        # Apache Tomcat Yükle
+        # Tomcat 10 için En az JDK 11 kurmalısınız
+        wget  https://archive.apache.org/dist/tomcat/tomcat-10/v10.0.8/bin/apache-tomcat-10.0.8.tar.gz
+        sudo tar xzvf apache-tomcat-10.0.8.tar.gz
+        sudo mkdir /opt/tomcat/
+        sudo mv apache-tomcat-10.0.8/* /opt/tomcat/
+        sudo chown -R www-data:www-data /opt/tomcat/
+        # İzinleri Sembolik Mod olarak değiştirmek
+        #sudo chmod -R u+rwx,g+rx,o+rx /opt/tomcat/
+        sudo chmod -R 755 /opt/tomcat/
+        
+         # Geri Sayım
+        ./countdown.sh
+
+        # Tomcat Servisi Başlatma Ve Etkinleştirme
+        sudo systemctl daemon-reload
+        sudo systemctl start tomcat
+
+        # Test 
+        curl http://localhost:8080
+
+        # Restart
+        sudo systemctl restart tomcat
+
+        # Tomcat Servisinin Otomatik Olarak Başlamasını Sağlıyordu.
+        sudo sytemctl enable tomcat
         
         echo -e "######### Version #########\n"
         which git
