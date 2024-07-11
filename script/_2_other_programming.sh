@@ -31,7 +31,11 @@ updated() {
             read -p "Sistemin Listesini Güncellemek İstiyor musunuz ? e/h " listUpdatedResult
             if [[ $listUpdatedResult == "e" || $listUpdatedResult == "E" ]]; then
                 echo -e "List Güncelleme Başladı ..."
+
+                # Geri Sayım
                 ./countdown.sh
+
+                # Güncelleme
                 sudo apt-get update
             else
                 echo -e "Güncelleme yapılmadı"
@@ -41,7 +45,11 @@ updated() {
             read -p "Sistemin Paketini Yükseltmek İstiyor musunuz ? e/h " systemListUpdatedResult
             if [[ $systemListUpdatedResult == "e" || $systemListUpdatedResult == "E" ]]; then
                 echo -e "Kernel Güncelleme Başladı ..."
+
+                # Geri Sayım
                 ./countdown.sh
+
+                # Güncelleme
                 sudo apt-get update && sudo apt-get upgrade -y
             else
                 echo -e "Güncelleme yapılmadı"
@@ -51,7 +59,11 @@ updated() {
             read -p "Sistemin Çekirdeğini Güncellemek İstiyor musunuz ? e/h " kernelUpdatedResult
             if [[ $kernelUpdatedResult == "e" || $kernelUpdatedResult == "E" ]]; then
                 echo -e "Kernel Güncelleme Başladı ..."
+
+                # Geri Sayım
                 ./countdown.sh
+
+                # Güncelleme
                 sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y
                 # Çekirdek(Kernel) güncellemelerinde yeniden başlamak gerekebilir
                 sudo apt list --upgradable | grep linux-image
@@ -73,7 +85,11 @@ logout() {
     read -p "Sistemi Kapatıp Tekrar Açmak ister misiniz ? e/h " logoutResult
     if [[ $logoutResult == "e" || $logoutResult == "E" ]]; then
         echo -e "Sitem Kapatılıyor ..."
+
+        # Geri Sayım
         ./countdown.sh
+
+        # Update
         sudo apt update
         clean # Temizleme Fonkisyonunu çağırsın
         ./reboot.sh
@@ -88,18 +104,23 @@ logout() {
 # Git Packet Install
 # Install
 gitInstall() {
-    sleep 2
+    # Güncelleme Fonksiyonu
+    updated
+
+    # Geri Sayım
+    ./countdown.sh
+
     echo -e "\n###### ${INSTALL} ######  "
     read -p "Git Paketini Yüklemek İstiyor musunuz ? e/h " gitInstallResult
     if [[ $gitInstallResult == "e" || $gitInstallResult == "E" ]]; then
         echo -e "Git Paket Yükleme Başladı ..."
+
+        # Geri Sayım
         ./countdown.sh
+
         echo -e "Bulunduğum dizin => $(pwd)\n"
         sleep 1
         echo -e "######### Git #########\n"
-
-        # Git Check Package dependency Fonksiyonunu çağır
-        check_package
 
         # Yükleme
         sudo apt-get install git -y 
@@ -108,13 +129,19 @@ gitInstall() {
         git config --global user.email "hamitmizrak@gmail.com"
         git config --global -l
 
+        # Geri Sayım
+        ./countdown.sh
+
+        echo -e "######### Git Version #########\n"
+        git --version
+
         # Clean Function
         clean
 
         # Yüklenen Paket Hakkında Bilgi Almak
         is_loading_package
 
-        # Paket Bağımlıklarını Görme
+         # Git Check Package dependency Fonksiyonunu çağır
         check_package
     else
         echo -e "Git Yükleme yapılmadı...."
@@ -122,6 +149,165 @@ gitInstall() {
 }
 gitInstall
 
+
+###################################################################
+###################################################################
+# VS CODE Packet Install
+# Install
+vsCodeInstall() {
+     # Güncelleme Fonksiyonu
+    updated
+
+    # Geri Sayım
+    ./countdown.sh
+
+    echo -e "\n###### ${INSTALL} ######  "
+    read -p "VS Code Paketini Yüklemek İstiyor musunuz ? e/h " vscodeInstallResult
+    if [[ $vscodeInstallResult == "e" || $vscodeInstallResult == "E" ]]; then
+        echo -e "VS Code Paket Yükleme Başladı ..."
+
+        # Geri Sayım
+        ./countdown.sh
+
+        echo -e "Bulunduğum dizin => $(pwd)\n"
+        sleep 1
+        echo -e "######### VS CODE #########\n"
+
+        # Yükleme
+        sudo snap install code --classic
+        sleep 1
+
+        sudo mkdir frontend
+        cd frontend
+        code .
+
+        # Clean Function
+        clean
+
+        # Yüklenen Paket Hakkında Bilgi Almak
+        is_loading_package
+
+        # VSCODE Check Package dependency Fonksiyonunu çağır
+        check_package
+    else
+        echo -e "Git Yükleme yapılmadı...."
+    fi
+}
+vsCodeInstall
+
+
+###################################################################
+###################################################################
+# JAVA JDK Packet Install
+# Install
+jdkInstall() {
+     # Güncelleme Fonksiyonu
+    updated
+
+    # Geri Sayım
+    ./countdown.sh
+
+    echo -e "\n###### ${INSTALL} ######  "
+    read -p "JDK Paketini Yüklemek İstiyor musunuz ? e/h " jdkInstallResult
+    if [[ $jdkInstallResult == "e" || $jdkInstallResult == "E" ]]; then
+        echo -e "JDK Paket Yükleme Başladı ..."
+
+        # Geri Sayım
+        ./countdown.sh
+
+        echo -e "Bulunduğum dizin => $(pwd)\n"
+        sleep 1
+        echo -e "######### JDK #########\n"
+
+        # Yükleme
+        sudo apt-get install openjdk-11-jdk -y
+        sudo add-apt-repository ppa:openjdk-r/ppa -y 
+        echo -e "#Java Home\nJAVA_HOME=\"/usr/lib/jvm/java-11-openjdk-amd64/bin/\" " >> ~/.bashrc
+
+        #sudo update-alternative --config java
+
+        # Geri Sayım
+        ./countdown.sh
+
+        echo -e "######### Git Version #########\n"
+        which git
+        which java 
+        java --version
+        javac --version
+
+        # Clean Function
+        clean
+
+        # Yüklenen Paket Hakkında Bilgi Almak
+        is_loading_package
+
+        # VSCODE Check Package dependency Fonksiyonunu çağır
+        check_package
+    else
+        echo -e "Git Yükleme yapılmadı...."
+    fi
+}
+jdkInstall
+
+###################################################################
+###################################################################
+# MAVEN Packet Install
+# Install
+mavenInstall() {
+     # Güncelleme Fonksiyonu
+    updated
+
+    # Geri Sayım
+    ./countdown.sh
+
+    echo -e "\n###### ${INSTALL} ######  "
+    read -p "MAVEN Paketini Yüklemek İstiyor musunuz ? e/h " mavenInstallResult
+    if [[ $mavenInstallResult == "e" || $mavenInstallResult == "E" ]]; then
+        echo -e "MAVEN Paket Yükleme Başladı ..."
+
+        # Geri Sayım
+        ./countdown.sh
+
+        echo -e "Bulunduğum dizin => $(pwd)\n"
+        sleep 1
+        echo -e "######### MAVEN #########\n"
+
+        # Yükleme
+        java --version 
+        javac --version
+        #sudo update-alternative --config java
+
+        # Geri Sayım
+        ./countdown.sh
+
+        # Maven Yükle
+        sudo apt install maven 
+        
+         # Geri Sayım
+        ./countdown.sh
+        
+        echo -e "######### Version #########\n"
+        which git
+        which java
+        which maven
+        git --version
+        java --version
+        javac --version
+        mvn --version
+
+        # Clean Function
+        clean
+
+        # Yüklenen Paket Hakkında Bilgi Almak
+        is_loading_package
+
+        # VSCODE Check Package dependency Fonksiyonunu çağır
+        check_package
+    else
+        echo -e "Git Yükleme yapılmadı...."
+    fi
+}
+mavenInstall
 
 ###################################################################
 ###################################################################
@@ -134,7 +320,10 @@ is_loading_package() {
     read -p "Paketin Yüklendiğini Öğrenmek İster misiniz ? e/h " packageResult
     if [[ $packageResult == "e" || $packageResult == "E" ]]; then
         echo -e "Yüklenmiş paket bilgisini öğrenme ..."
+
+        # Geri Sayım
         ./countdown.sh
+
         echo -e "Bulunduğum dizin => $(pwd)\n"
         sleep 1
 
@@ -163,11 +352,16 @@ package_information() {
 
     # Paketin Yüklü olup olmadığını Kontrol Etmek
     dpkg-query -W -f='${Status} ${Package}\n' $packagename
+
+    # Geri Sayım
     ./countdown.sh
 
     # Yüklü Tüm paketleri Listele
     dpkg -l 
+
+    # Geri Sayım
     ./countdown.sh
+
     # Eğer paket isimleri uzunsa grep ile arama yap 
     dpkg -l | grep $packagename
 
@@ -191,7 +385,10 @@ check_package() {
     read -p "Sistem İçin Genel Bağımlılık Paketini Yüklemek İstiyor musunuz ? e/h " checkResult
     if [[ $checkResult == "e" || $checkResult == "E" ]]; then
         echo -e "Yüklenecek Paket Bağımlılığı ..."
+
+        # Geri Sayım
         ./countdown.sh
+
         echo -e "Bulunduğum dizin => $(pwd)\n"
         sleep 1
 
@@ -223,7 +420,10 @@ information() {
     read -p "Genel Bilgileri Görmek ister misiniz ? e/h " informationResult
     if [[ $informationResult == "e" || $informationResult == "E" ]]; then
         echo -e "Genel Bilgiler Verilmeye Başlandı ..."
+
+        # Geri Sayım
         ./countdown.sh
+
         #sudo su
         echo -e "Ben Kimim => $(whoami)\n"
         sleep 1
@@ -257,7 +457,10 @@ clean() {
     read -p "Sistemde Gereksiz Paketleri Temizlemek İster misiniz ? e/h " cleanResult
     if [[ $cleanResult == "e" || $cleanResult == "E" ]]; then
         echo -e "Gereksiz Paket Temizliği Başladı ..."
+
+        # Geri Sayım
         ./countdown.sh
+
         echo -e "######### nginx #########\n"
         sudo apt-get autoremove -y
         sudo apt autoclean
@@ -280,8 +483,10 @@ portVersion() {
     gcc --version # gcc: GNU C compiler derlemek
     g++ --version # g++: GNU C++ compiler derlemek
     make --version # make: Makefile kullanarak derlemek içindir
-    #java --version
-    #git --version
+    git --version
+    java --version
+    javac --version
+     mvn --version
     #docker-compose -v
 }
 portVersion
