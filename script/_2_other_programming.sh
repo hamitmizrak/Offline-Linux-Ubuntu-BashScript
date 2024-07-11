@@ -15,6 +15,8 @@ PACKAGE="Paket Sistemde Yüklü mü"
 DOCKER_PULL="Docker Pulling"
 LOGIN="Docker Login"
 LOGOUT="Docker Logout"
+PORTAINER="Docker Portainer"
+DOCKERCOMPOSE="Docker Compose"
 
 
 
@@ -488,6 +490,12 @@ dockerInstall() {
         # DockerHub Logout 
         dockerHubLogout
 
+        # Docker Compose 
+        dockerCompose
+
+        # Docker Linux Ubuntu Portainer
+        dockerPortainer
+
         # Version
         echo -e "######### Version #########\n"
         which git
@@ -523,17 +531,24 @@ dockerPulling() {
     then
         echo -e "Docker Pulling ... "  
         sudo docker pull nginx
-        sudo docker pull httpd
+        sudo docker pull httpd # apache
+        docker pull tomcat:9.0.8-jre8-alpine
         sudo docker pull mysql
-        sudo docker pull mongo
+        sudo docker pull postgres
         sudo docker pull ubuntu
+        sudo docker pull alpine
         sudo docker pull centos
+        sudo docker pull node # nodejs
+        sudo docker pull mongo # nosql
+        sudo docker pull redis
+        sudo docker pull python:3.8
+        docker images
     else
         echo -e "apt-get Update List Güncelleme Yapılmadı!!!\n "   
     fi
 }
 
-# dockerHubLogout
+# dockerHubLogin
 dockerHubLogin() {
     # Geri Sayım
     ./countdown.sh
@@ -562,6 +577,56 @@ dockerHubLogout() {
         sudo docker logout
     else
         echo -e "apt-get Update List Güncelleme Yapılmadı!!!\n "   
+    fi
+}
+
+# Docker Portainer
+dockerPortainer(){
+    # Geri Sayım
+    ./countdown.sh
+
+    echo -e "\n### ${PORTAINER} ###"
+    read -p "\nDockerHub'a Çıkış yapmak istiyor musunuz ? E/H? " portainerResult
+    if [[ $portainerResult == "E" || $portainerResult == "e"  ]]
+    then
+        echo -e "Docker Portainer ... "  
+        ##### Aşağıdaki kodları yaz ##########################################
+        sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+
+        ##### CHMOD ##########################################
+        sudo chmod +x /usr/local/bin/docker-compose
+        sudo docker volume create portainer_data
+
+        ##### PORT##########################################
+        sudo docker run -d -p 2222:9000 -p 8000:8000 --name portainer --restart always -v /var/run/docker.sock:/var/run/docker.sock -v /srv/portainer:/data portainer/portainer
+        sudo docker start portainer
+        sudo docker stop portainer
+
+        ##### CHMOD ##########################################
+        ifconfig
+        sudo curl localhost:2222 
+
+        # username:root
+        # password:rootroot
+
+    else
+        echo -e "Docker Portainer Ekleme Yapılmadı!!!\n "   
+    fi
+}
+
+# Docker Compose
+dockerCompose(){
+    # Geri Sayım
+    ./countdown.sh
+
+    echo -e "\n### ${DOCKERCOMPOSE} ###"
+    read -p "\nDocker Compose Eklemek İstiyor musunuz ? E/H? " dockerComposeResult
+    if [[ $dockerComposeResult == "E" || $dockerComposeResult == "e"  ]]
+    then
+        echo -e "Docker Compose Ekleniyor ... "  
+      
+    else
+        echo -e "Docker Compose Ekleme Yapılmadı!!!\n "   
     fi
 }
 
@@ -743,8 +808,11 @@ portVersion() {
     java --version
     javac --version
     mvn --version
+
     # Tomcat Version
     /opt/tomcat/bin/catalina.sh version 
-    #docker-compose -v
+
+    # docker Version
+    docker-compose -v
 }
 portVersion

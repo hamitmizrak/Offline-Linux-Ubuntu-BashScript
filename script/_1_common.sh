@@ -260,7 +260,8 @@ theFirewallInstall() {
         sudo ufw allow 80
         sudo ufw allow 443
         sudo ufw allow 1111
-        sudo ufw allow 2222
+        sudo ufw allow 2222 # docker portainer
+        sudo ufw allow 8000 # docker portainer
         sudo ufw allow 3333
         sudo ufw allow 3306
         sudo ufw allow 5432
