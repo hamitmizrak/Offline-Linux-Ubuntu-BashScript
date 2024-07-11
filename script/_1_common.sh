@@ -74,7 +74,7 @@ updated() {
             else
                 echo -e "Güncelleme yapılmadı"
             fi
-            ;; 
+        ;; 
         2)
             read -p "Sistemin Paketini Yükseltmek İstiyor musunuz ? e/h " systemListUpdatedResult
             if [[ $systemListUpdatedResult == "e" || $systemListUpdatedResult == "E" ]]; then
@@ -84,7 +84,7 @@ updated() {
             else
                 echo -e "Güncelleme yapılmadı"
             fi
-            ;; 
+        ;; 
         3)
             read -p "Sistemin Çekirdeğini Güncellemek İstiyor musunuz ? e/h " kernelUpdatedResult
             if [[ $kernelUpdatedResult == "e" || $kernelUpdatedResult == "E" ]]; then
@@ -96,7 +96,7 @@ updated() {
             else
                 echo -e "Güncelleme yapılmadı"
             fi
-            ;;
+        ;;
         *)
             echo -e "Lütfen sadece size belirtilen seçeneği seçiniz"
 }
