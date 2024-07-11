@@ -47,7 +47,7 @@ accessPermission() {
         sudo chmod +x reboot.sh
         sudo chmod +x _2_other_programming.sh
     else
-        echo -e "Dosya izinleri yapılmadı"
+        echo -e "Dosya İzinleri Yapılmadı..."
     fi
 }
 # Function Calling
@@ -73,19 +73,19 @@ updated() {
                 ./countdown.sh
                 sudo apt-get update
             else
-                echo -e "Güncelleme yapılmadı"
+                echo -e "Sistemin Listesini Güncellenemesi yapılmadı"
             fi
-        ;; 
+            ;; 
         2)
             read -p "Sistemin Paketini Yükseltmek İstiyor musunuz ? e/h " systemListUpdatedResult
             if [[ $systemListUpdatedResult == "e" || $systemListUpdatedResult == "E" ]]; then
-                echo -e "Kernel Güncelleme Başladı ..."
+                echo -e "Sistem Paket Güncellenmesi Başladı ..."
                 ./countdown.sh
                 sudo apt-get update && sudo apt-get upgrade -y
             else
-                echo -e "Güncelleme yapılmadı"
+                echo -e "Sistem Paket Güncellenmesi  yapılmadı..."
             fi
-        ;; 
+            ;; 
         3)
             read -p "Sistemin Çekirdeğini Güncellemek İstiyor musunuz ? e/h " kernelUpdatedResult
             if [[ $kernelUpdatedResult == "e" || $kernelUpdatedResult == "E" ]]; then
@@ -95,11 +95,13 @@ updated() {
                 # Çekirdek(Kernel) güncellemelerinde yeniden başlamak gerekebilir
                 sudo apt list --upgradable | grep linux-image
             else
-                echo -e "Güncelleme yapılmadı"
+                echo -e "Kernel Güncellemesi Yapılmadı..."
             fi
-        ;;
+            ;;
         *)
             echo -e "Lütfen sadece size belirtilen seçeneği seçiniz"
+            ;;
+    esac
 }
 updated
 
@@ -117,7 +119,7 @@ logout() {
         clean # Temizleme Fonkisyonunu çağırsın
         ./reboot.sh
     else
-        echo -e "Sistem Kapatılmadı"
+        echo -e "Sistem Kapatılmadı..."
     fi
 }
 # logout
@@ -150,7 +152,7 @@ install() {
         theFirewallInstall
         theFirewallDelete
     else
-        echo -e "Güncelleme yapılmadı"
+        echo -e "Sistem İçin Genel Yükleme Yapılmadı..."
     fi
 }
 install
@@ -192,7 +194,7 @@ packageInstall() {
         echo -e "######### Python  #########\n"
         sudo apt install python3 python3-pip -y
     else
-        echo -e "Güncelleme yapılmadı"
+        echo -e "Sistem İçin Genel Paket Yüklemesi Yapılmadı..."
     fi
 }
 packageInstall
@@ -216,7 +218,7 @@ check_package() {
         # dependency
         dependency "$user_input"
     else
-        echo -e "Güncelleme yapılmadı"
+        echo -e "Paket Bağımlıklarını Yapılmadı..."
     fi
 }
 
@@ -274,7 +276,7 @@ theFirewallInstall() {
         # UFW Status
         sudo ufw status
     else
-        echo -e "Güncelleme yapılmadı"
+        echo -e "Güvenlik Duvarı Açılmadı..."
     fi
 }
 #theFirewallInstall
@@ -319,7 +321,7 @@ theFirewallDelete() {
         # UFW Status
         sudo ufw status
     else
-        echo -e "Güncelleme yapılmadı"
+        echo -e "Güvenlik Duvarı Ayarları Kapatılmadı .... "
     fi
 }
 #theFirewallDelete
@@ -352,7 +354,7 @@ information() {
         echo -e "RAM Bilgileri => $(free -m)\n"
         sleep 1
     else
-        echo -e "Dosya izinleri yapılmadı"
+        echo -e "Dosya İzinleri Yapılmadı"
     fi
 }
 information
@@ -374,7 +376,7 @@ clean() {
         echo -e "Kırık Bağımlılıkları Yükle ..."
         sudo apt install -f
     else
-        echo -e "Güncelleme yapılmadı"
+        echo -e "Temizleme Yapılmadı..."
     fi
 }
 clean
@@ -412,7 +414,7 @@ other_technology() {
         ./_2_other_programming.sh
        
     else
-        echo -e "Teknolojiler Yüklenmeye başlanmadı ...."
+        echo -e "Teknolojiler Yüklenmeye Başlanmadı ...."
     fi
 }
 other_technology
