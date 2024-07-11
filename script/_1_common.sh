@@ -44,6 +44,7 @@ accessPermission() {
         # Bash scriptlere izin vermek
         sudo chmod +x countdown.sh
         sudo chmod +x reboot.sh
+        sudo chmod +x _2_other_programming.sh
     else
         echo -e "Dosya izinleri yapılmadı"
     fi
@@ -57,32 +58,47 @@ accessPermission
 updated() {
     sleep 2
     echo -e "\n###### ${UPDATED} ######  "
-    read -p "Sistemin Listesini Güncellemek İstiyor musunuz ? e/h " listUpdatedResult
-    if [[ $listUpdatedResult == "e" || $listUpdatedResult == "E" ]]; then
-        echo -e "List Güncelleme Başladı ..."
-        ./countdown.sh
-        sudo apt-get update
-    else
-        echo -e "Güncelleme yapılmadı"
-    fi
-    read -p "Sistemin Paketini Yükseltmek İstiyor musunuz ? e/h " systemListUpdatedResult
-    if [[ $systemListUpdatedResult == "e" || $systemListUpdatedResult == "E" ]]; then
-        echo -e "Kernel Güncelleme Başladı ..."
-        ./countdown.sh
-        sudo apt-get update && sudo apt-get upgrade -y
-    else
-        echo -e "Güncelleme yapılmadı"
-    fi
-    read -p "Sistemin Çekirdeğini Güncellemek İstiyor musunuz ? e/h " kernelUpdatedResult
-    if [[ $kernelUpdatedResult == "e" || $kernelUpdatedResult == "E" ]]; then
-        echo -e "Kernel Güncelleme Başladı ..."
-        ./countdown.sh
-        sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y
-        # Çekirdek(Kernel) güncellemelerinde yeniden başlamak gerekebilir
-        sudo apt list --upgradable | grep linux-image
-    else
-        echo -e "Güncelleme yapılmadı"
-    fi
+    
+    # Güncelleme Tercihi
+    echo -e "Güncelleme İçin Seçim Yapınız\n1-)update\n2-)upgrade\n3-)dist-upgrade"
+    read chooise
+
+    # Girilen sayıya göre tercih
+    case $chooise in
+        1)
+            read -p "Sistemin Listesini Güncellemek İstiyor musunuz ? e/h " listUpdatedResult
+            if [[ $listUpdatedResult == "e" || $listUpdatedResult == "E" ]]; then
+                echo -e "List Güncelleme Başladı ..."
+                ./countdown.sh
+                sudo apt-get update
+            else
+                echo -e "Güncelleme yapılmadı"
+            fi
+            ;; 
+        2)
+            read -p "Sistemin Paketini Yükseltmek İstiyor musunuz ? e/h " systemListUpdatedResult
+            if [[ $systemListUpdatedResult == "e" || $systemListUpdatedResult == "E" ]]; then
+                echo -e "Kernel Güncelleme Başladı ..."
+                ./countdown.sh
+                sudo apt-get update && sudo apt-get upgrade -y
+            else
+                echo -e "Güncelleme yapılmadı"
+            fi
+            ;; 
+        3)
+            read -p "Sistemin Çekirdeğini Güncellemek İstiyor musunuz ? e/h " kernelUpdatedResult
+            if [[ $kernelUpdatedResult == "e" || $kernelUpdatedResult == "E" ]]; then
+                echo -e "Kernel Güncelleme Başladı ..."
+                ./countdown.sh
+                sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y
+                # Çekirdek(Kernel) güncellemelerinde yeniden başlamak gerekebilir
+                sudo apt list --upgradable | grep linux-image
+            else
+                echo -e "Güncelleme yapılmadı"
+            fi
+            ;;
+        *)
+            echo -e "Lütfen sadece size belirtilen seçeneği seçiniz"
 }
 updated
 
@@ -127,8 +143,11 @@ install() {
         sleep 1
         sudo apt-get install openssh-server -y
         sleep 1
-        sudo apt install build-essential wget zip unzip -y
         # build-essential: Temel Geliştirme araçları içeren meta-pakettir
+        sudo apt install build-essential wget zip unzip -y
+        # Firewall Function
+        theFirewallInstall
+        theFirewallDelete
     else
         echo -e "Güncelleme yapılmadı"
     fi
@@ -257,7 +276,7 @@ theFirewallInstall() {
         echo -e "Güncelleme yapılmadı"
     fi
 }
-theFirewallInstall
+#theFirewallInstall
 
 # Güvenlik duvarı DELETE   (UFW => Uncomplicated Firewall)
 theFirewallDelete() {
@@ -302,7 +321,7 @@ theFirewallDelete() {
         echo -e "Güncelleme yapılmadı"
     fi
 }
-theFirewallDelete
+#theFirewallDelete
 
 ###################################################################
 ###################################################################
@@ -363,15 +382,15 @@ clean
 ###################################################################
 # Port And Version
 portVersion() {
-    # node -v
-    # java --version
-    # git --version
-    # docker-compose -v
-    # zip -v
-    # unzip -v+
+    node -v
+    zip -v
+    unzip -v+
     # build-essential:
-    # gcc --version # gcc: GNU C compiler derlemek
-    # g++ --version # g++: GNU C++ compiler derlemek
-    # make --version # make: Makefile kullanarak derlemek içindir
+    gcc --version # gcc: GNU C compiler derlemek
+    g++ --version # g++: GNU C++ compiler derlemek
+    make --version # make: Makefile kullanarak derlemek içindir
+    #java --version
+    #git --version
+    #docker-compose -v
 }
 portVersion
