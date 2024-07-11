@@ -22,6 +22,26 @@ accessPermission() {
     if [[ $permissionResult == "e" || $permissionResult == "E" ]]; then
         echo -e "Dosya izinleri Başladı ..."
         ./countdown.sh
+        # chmod: Dosya ve dizinlerin erişimi için izinler
+        # r: Okuma(read) 2^2=4
+        # w: Yazma(Write) 2^1=2
+        # x: Çalıştırma(Execute) 2^0=1
+
+        # Kullanıcı Kategorileri
+        # u: Dosya sahibi(user)
+        # g: Grup Üyeleri(group)
+        # o: Diğer Kullanıcılar (others)
+        # a: Tüm kullancıılar (all)
+        ls -al
+        ls -l countdown.sh
+        ls -l reboot.sh
+        # İzinleri Sembolik Mod olarak değiştirmek
+        chmod u+rwx,g+rx,o+rx ./script
+
+        # İzinleri Sayısal Mod olarak değiştirmek
+        chmod 755 ./script
+
+        # Bash scriptlere izin vermek
         sudo chmod +x countdown.sh
         sudo chmod +x reboot.sh
     else
@@ -66,7 +86,6 @@ updated() {
 }
 updated
 
-
 ###################################################################
 ###################################################################
 # logout
@@ -77,7 +96,7 @@ logout() {
     if [[ $logoutResult == "e" || $logoutResult == "E" ]]; then
         echo -e "Sitem Kapatılıyor ..."
         ./countdown.sh
-        sudo apt update 
+        sudo apt update
         clean # Temizleme Fonkisyonunu çağırsın
         ./reboot.sh
     else
@@ -100,14 +119,14 @@ install() {
         sleep 1
         sudo apt-get install vim -y
         sleep 1
-        sudo apt-get install rar -y 
+        sudo apt-get install rar -y
         sleep 1
-        sudo apt-get install unrar -y 
+        sudo apt-get install unrar -y
         sleep
-        sudo apt-get install curl -y 
+        sudo apt-get install curl -y
         sleep 1
         sudo apt-get install openssh-server -y
-        sleep 1 
+        sleep 1
         sudo apt install build-essential wget zip unzip -y
         # build-essential: Temel Geliştirme araçları içeren meta-pakettir
     else
@@ -130,7 +149,9 @@ packageInstall() {
         echo -e "######### nginx #########\n"
         # Nginx Check Package dependency Fonksiyonunu çağır
         check_package
-        sudo apt-get install nginx -y 
+
+        # Yükleme
+        sudo apt-get install nginx -y
         sudo systemctl start nginx
         sudo systemctl enable mginx
         ./countdown.sh
@@ -140,7 +161,7 @@ packageInstall() {
         ./countdown.sh
 
         echo -e "######### Brute Force  #########\n"
-        sudo apt install fail2ban -y 
+        sudo apt install fail2ban -y
         sudo systemctl start fail2ban
         sudo systemctl enable fail2ban
         ./countdown.sh
@@ -160,8 +181,8 @@ packageInstall
 ###################################################################
 # Paket Bağımlıklarını Görme
 check_package() {
-sleep 2
-    echo -e "\n###### ${CHECK} ######  " 
+    sleep 2
+    echo -e "\n###### ${CHECK} ######  "
     read -p "Sistem İçin Genel Paket Yüklemek İstiyor musunuz ? e/h " checkResult
     if [[ $checkResult == "e" || $checkResult == "E" ]]; then
         echo -e "Yüklenecek Paket Bağımlılığı ..."
@@ -179,11 +200,11 @@ sleep 2
     fi
 }
 
-dependency(){
+dependency() {
     # parametre - arguman
     local packagename=$1
-    # 
-    sudo apt-get check 
+    #
+    sudo apt-get check
     sudo apt-cache depends $packagename
     sudo apt-get install $packagename
 }
@@ -192,15 +213,96 @@ dependency(){
 ###################################################################
 # Güvenlik duvarı INSTALL  (UFW => Uncomplicated Firewall)
 theFirewallInstall() {
+    sleep 2
+    echo -e "\n###### ${UFW} ######  "
+    read -p "Güvenlik Duvarı Kurulumlarını İster misiniz ? e/h " ufwResult
+    if [[ $ufwResult == "e" || $ufwResult == "E" ]]; then
+        echo -e "Güvenlik Duvarı Kuurlumları ,port izinler ve IP adres izinleri başladı ..."
+        ./countdown.sh
+        netstat -nlptu
+        sleep 3
+        echo -e "######### UFW (Uncomplicated Firewall) #########\n"
+        # UFW kurulumu
+        sudo apt install ufw -y
 
+        # UFW Status
+        sudo ufw status
+
+        # Varsayılan Giden Trafik Kurallarını Belirlemek(Dış dünyayay yapılan bağlantıların varsayılan olarak izin verildiği anlamına gelir)
+        # Tüm Giden Trafiğe İzin Ver
+        sudo ufw default allow outgoing
+
+        # Ssh(Secure Shell) trafiğine izin verir. Bağlantılara izin vermek
+        sudo ufw allow ssh
+        sudo ufw allow 22
+        sudo ufw allow 80
+        sudo ufw allow 443
+        sudo ufw allow 1111
+        sudo ufw allow 2222
+        sudo ufw allow 3333
+        sudo ufw allow 3306
+        sudo ufw allow 5432
+        sudo ufw allow 8080
+        sudo ufw allow 9000
+        sudo ufw allow 9090
+        # IP: 127.0.0.1 DNS: localhost
+        sudo ufw allow from 127.0.0.1 to any port 8080
+
+        # UFW Etkinleştirme
+        sudo ufw enable
+
+        # UFW Status
+        sudo ufw status
+    else
+        echo -e "Güncelleme yapılmadı"
+    fi
 }
 theFirewallInstall
 
 # Güvenlik duvarı DELETE   (UFW => Uncomplicated Firewall)
-heFirewallDelete() {
+theFirewallDelete() {
+    sleep 2
+    echo -e "\n###### ${UFW} ######  "
+    read -p "Güvenlik Duvarı Kapatmak İster misiniz ? e/h " ufwCloseResult
+    if [[ $ufwResufwCloseResultult == "e" || $ufwCloseResult == "E" ]]; then
+        echo -e "Güvenlik Duvarı port,ip,gelen giden ağlar kapatılmaya  başladı ..."
+        ./countdown.sh
+        netstat -nlptu
+        sleep 3
+        echo -e "######### UFW (Uncomplicated Firewall) #########\n"
+        # UFW Status
+        sudo ufw status
 
+        # Varsayılarn Gelen Trafik Kurallarını belirleme(Güvenliği artırmak için gelen bağlantıları varsayılan olarak reddeder yalnızca belirlenen bağlantılara izin verir)
+        # Tüm Gelen Trafiği Engelle
+        sudo ufw default deny incoming
+
+        # Ssh(Secure Shell) trafiğine izin verir. Bağlantılara izin vermek
+        sudo ufw delete allow ssh
+        sudo ufw delete allow 22
+        sudo ufw delete allow 80
+        sudo ufw delete allow 443
+        sudo ufw delete allow 1111
+        sudo ufw delete allow 2222
+        sudo ufw delete allow 3333
+        sudo ufw delete allow 3306
+        sudo ufw delete allow 5432
+        sudo ufw delete allow 8080
+        sudo ufw delete allow 9000
+        sudo ufw delete allow 9090
+        # IP: 127.0.0.1 DNS: localhost
+        sudo ufw delete allow from 127.0.0.1 to any port 8080
+
+        # UFW Devre Dışı Bırak
+        sudo ufw disable
+
+        # UFW Status
+        sudo ufw status
+    else
+        echo -e "Güncelleme yapılmadı"
+    fi
 }
-heFirewallDelete
+theFirewallDelete
 
 ###################################################################
 ###################################################################
@@ -247,10 +349,10 @@ clean() {
         echo -e "Gereksiz Paket Temizliği Başladı ..."
         ./countdown.sh
         echo -e "######### nginx #########\n"
-        sudo apt-get autoremove -y 
+        sudo apt-get autoremove -y
         sudo apt autoclean
-         echo -e "Kırık Bağımlılıkları Yükle ..."
-         sudo apt install -f
+        echo -e "Kırık Bağımlılıkları Yükle ..."
+        sudo apt install -f
     else
         echo -e "Güncelleme yapılmadı"
     fi
@@ -261,15 +363,15 @@ clean
 ###################################################################
 # Port And Version
 portVersion() {
-# node -v
-        # java --version
-        # git --version
-        # docker-compose -v
-        # zip -v 
-        # unzip -v+
-        # build-essential:
-        # gcc --version # gcc: GNU C compiler derlemek
-        # g++ --version # g++: GNU C++ compiler derlemek
-        # make --version # make: Makefile kullanarak derlemek içindir
+    # node -v
+    # java --version
+    # git --version
+    # docker-compose -v
+    # zip -v
+    # unzip -v+
+    # build-essential:
+    # gcc --version # gcc: GNU C compiler derlemek
+    # g++ --version # g++: GNU C++ compiler derlemek
+    # make --version # make: Makefile kullanarak derlemek içindir
 }
 portVersion
