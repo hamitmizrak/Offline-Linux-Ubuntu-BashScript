@@ -12,6 +12,11 @@ UFW="Uncomplicated Firewall Ggüvenlik duvarı Yöentim Araçı"
 LOGOUT="Sistemi Tekrar Başlatmak"
 CHECK="Yüklencek Paket bağımlılıkları"
 PACKAGE="Paket Sistemde Yüklü mü"
+JDK="JDK Kurmak"
+JENKINS="Jenkins"
+TOMCAT="Apache Tomcat"
+POSTGRESQL="Postgresql"
+SONARQUBE="SonarQube"
 DOCKER_PULL="Docker Pulling"
 LOGIN="Docker Login"
 LOGOUT="Docker Logout"
@@ -20,6 +25,8 @@ DOCKERCOMPOSE="Docker Compose"
 
 ###################################################################
 ###################################################################
+sudo chmod +x ./countdown.sh
+
 # Updated
 updated() {
     sleep 2
@@ -114,7 +121,7 @@ is_loading_package() {
         echo -e "Yüklenmiş paket bilgisini öğrenme ..."
 
         # Geri Sayım
-        sudo ./countdown.sh
+        sudo ././countdown.sh
 
         echo -e "Bulunduğum dizin => $(pwd)\n"
         sleep 1
@@ -336,7 +343,7 @@ jdkInstall() {
     # Geri Sayım
     sudo ./countdown.sh
 
-    echo -e "\n###### ${INSTALL} ######  "
+    echo -e "\n###### ${JDK} ######  "
     read -p "JDK Paketini Yüklemek İstiyor musunuz ? e/h " jdkInstallResult
     if [[ $jdkInstallResult == "e" || $jdkInstallResult == "E" ]]; then
         echo -e "JDK Paket Yükleme Başladı ..."
@@ -440,8 +447,191 @@ mavenInstall
 
 ###################################################################
 ###################################################################
+# JENKINS Packet Install
+
+# Jenkins Delete
+jenkinsDelete() {
+     # Güncelleme Fonksiyonu
+    updated
+
+    # Geri Sayım
+    sudo ./countdown.sh
+
+    echo -e "\n###### ${JENKINS} Delete ######  "
+    read -p "Jenkins Paketini Silmek İstiyor musunuz ? e/h " jenkinsDeleteResult
+    if [[ $jenkinsDeleteResult == "e" || $jenkinsDeleteResult == "E" ]]; then
+        echo -e "Jenkins Paket Yükleme Başladı ..."
+
+        # Geri Sayım
+        sudo ./countdown.sh
+
+        echo -e "Bulunduğum dizin => $(pwd)\n"
+        sleep 1
+        echo -e "######### JENKINS DELETE #########\n"
+
+        # Yükleme
+        java --version 
+        javac --version
+        mvn -v
+        #sudo update-alternative --config java
+
+        # Geri Sayım
+        sudo ./countdown.sh
+
+        echo -e "######### JENKINS DELETE #########\n"
+        sudo service jenkins stop
+        sudo apt-get remove --purge jenkins
+        sudo apt-get remove jenkins
+        sudo apt-get remove --auto-remove jenkins -y
+
+        # Clean Function
+        clean
+
+        # Yüklenen Paket Hakkında Bilgi Almak
+        is_loading_package
+
+        # VSCODE Check Package dependency Fonksiyonunu çağır
+        check_package
+    else
+        echo -e "Maven Yüklenmesi Yapılmadı...."
+    fi
+}
+
+# Jenkins Install
+jenkinsInstall() {
+     # Güncelleme Fonksiyonu
+    updated
+
+    # Geri Sayım
+    sudo ./countdown.sh
+
+    echo -e "\n###### ${JENKINS} Kurmak ######  "
+    read -p "Jenkins Paketini Yüklemek İstiyor musunuz ? e/h " jenkinsInstallResult
+    if [[ $jenkinsInstallResult == "e" || $jenkinsInstallResult == "E" ]]; then
+        echo -e "Jenkins Paket Yükleme Başladı ..."
+
+        # Geri Sayım
+        sudo ./countdown.sh
+
+        echo -e "Bulunduğum dizin => $(pwd)\n"
+        sleep 1
+        echo -e "######### JENKINS #########\n"
+
+        # Yükleme
+        java --version 
+        javac --version
+        mvn -v
+        #sudo update-alternative --config java
+
+        # Geri Sayım
+        sudo ./countdown.sh
+
+        sudo ufw allow 3333
+
+        # Jenkins Yükle
+        # sudo su -
+        sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+        https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+        https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+        /etc/apt/sources.list.d/jenkins.list > /dev/null
+        
+        sudo apt-get update
+        sudo apt-get install jenkins -y
+
+        # Jenkins'in varsayılan yapılandırma dosyasını düzenleyerek portu 9090 olarak değiştirin
+        sudo sed -i 's/Environment="JENKINS_PORT=8080"/Environment="JENKINS_PORT=3333"/' /usr/lib/systemd/system/jenkins.service
+        systemctl daemon-reload
+        # Jenkins'in otomatik olarak başlamasını etkinleştirin
+        sudo systemctl enable jenkins
+        sudo systemctl start jenkins
+        sudo systemctl restart jenkins
+        # sudo systemctl stop jenkins
+        sudo systemctl status jenkins
+        sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+         # Geri Sayım
+        sudo ./countdown.sh
+
+        # Jenkins Şifre Al
+        sudo cat /var/lib/jenkins/secrets/initialAdminPassword 
+
+        echo -e "######### Version #########\n"
+        which git
+        which java
+        which maven
+        git --version
+        java --version
+        javac --version
+        mvn --version
+
+        # Clean Function
+        clean
+
+        # Yüklenen Paket Hakkında Bilgi Almak
+        is_loading_package
+
+        # VSCODE Check Package dependency Fonksiyonunu çağır
+        check_package
+    else
+        echo -e "Maven Yüklenmesi Yapılmadı...."
+    fi
+}
+jenkinsInstall
+
+# Jenkins Delete
+jenkinsDelete
+
+###################################################################
+###################################################################
 # Apache Tomcat Packet Install
-# Install
+
+# Tomcat Delete
+apacheTomcatDelete() {
+     # Güncelleme Fonksiyonu
+    updated
+
+    # Geri Sayım
+    sudo ./countdown.sh
+
+    echo -e "\n###### ${TOMCAT} ######  "
+    read -p "APACHE TOMCAT Paketini Silmek İstiyor musunuz ? e/h " apacheTomcatDeleteResult
+    if [[ $apacheTomcatDeleteResult == "e" || $apacheTomcatDeleteResult == "E" ]]; then
+        echo -e "APACHE TOMCAT Paket Silme Yükleme Başladı ..."
+
+        # Yükleme
+        java --version 
+        javac --version
+        mvn --version
+
+        # Geri Sayım
+        sudo ./countdown.sh
+
+        echo -e "Bulunduğum dizin => $(pwd)\n"
+        sleep 1
+        echo -e "######### APACHE TOMCAT #########\n"
+        sudo rm -rf /opt/tomcat
+    
+        # Eğer Açılmazsa
+        # sudo /opt/tomcat/bin/startup.sh
+
+         # Geri Sayım
+        sudo ./countdown.sh
+        
+        # Clean Function
+        clean
+
+        # Yüklenen Paket Hakkında Bilgi Almak
+        is_loading_package
+
+        # VSCODE Check Package dependency Fonksiyonunu çağır
+        check_package
+    else
+        echo -e "Apache Tomcat Silme Yapılmadı...."
+    fi
+}
+
+# Tomcat Install
 apacheTomcatInstall() {
      # Güncelleme Fonksiyonu
     updated
@@ -449,7 +639,7 @@ apacheTomcatInstall() {
     # Geri Sayım
     sudo ./countdown.sh
 
-    echo -e "\n###### ${INSTALL} ######  "
+    echo -e "\n###### ${TOMCAT} ######  "
     read -p "APACHE TOMCAT Paketini Yüklemek İstiyor musunuz ? e/h " apacheTomcatInstallResult
     if [[ $apacheTomcatInstallResult == "e" || $apacheTomcatInstallResult == "E" ]]; then
         echo -e "APACHE TOMCAT Paket Yükleme Başladı ..."
@@ -473,7 +663,7 @@ apacheTomcatInstall() {
 
         # Apache Tomcat Yükle
         # Tomcat 10 için En az JDK 11 kurmalısınız
-        wget  https://archive.apache.org/dist/tomcat/tomcat-10/v10.0.8/bin/apache-tomcat-10.0.8.tar.gz
+        sudo wget  https://archive.apache.org/dist/tomcat/tomcat-10/v10.0.8/bin/apache-tomcat-10.0.8.tar.gz
         sudo tar xzvf apache-tomcat-10.0.8.tar.gz
         sudo mkdir /opt/tomcat/
         sudo mv apache-tomcat-10.0.8/* /opt/tomcat/
@@ -486,21 +676,32 @@ apacheTomcatInstall() {
          # Geri Sayım
         sudo ./countdown.sh
 
+        # Değişkenler
+        TOMCAT_PORT=4444
+        INSTALL_DIR=/opt/tomcat
+        # 8080 => 
+        sudo sed -i "s/port=\"8080\"/port=\"$TOMCAT_PORT\"/" $INSTALL_DIR/conf/server.xml
+
+        sudo ./opt/tomcat/bin/startup.sh
+
         # Tomcat Servisi Başlatma Ve Etkinleştirme
-        sudo systemctl daemon-reload
-        sudo systemctl start tomcat
+        #sudo systemctl daemon-reload
+        #sudo systemctl start tomcat
 
         # Test 
-        curl http://localhost:8080
+        sudo curl http://localhost:4444
 
         # Restart
-        sudo systemctl restart tomcat
+        #sudo systemctl restart tomcat
 
         # Tomcat Servisinin Otomatik Olarak Başlamasını Sağlıyordu.
-        sudo sytemctl enable tomcat
+        #sudo sytemctl enable tomcat
 
         # Tomcat Version
-        /opt/tomcat/bin/catalina.sh version 
+        #sudo /opt/tomcat/bin/catalina.sh version 
+
+        # Eğer Açılmazsa
+        # sudo /opt/tomcat/bin/startup.sh
 
          # Geri Sayım
         sudo ./countdown.sh
@@ -527,6 +728,193 @@ apacheTomcatInstall() {
     fi
 }
 apacheTomcatInstall
+
+# Tomcat Silmek
+apacheTomcatDelete
+
+
+
+###################################################################
+###################################################################
+# Psotgresql Packet Install
+postgresql(){
+   
+    echo -e "\n### ${POSTGRESQL} Kurulumu ###"
+    read -p "\nPostgresql Eklemek İstiyor musunuz ? E/H? " postgresqlResult
+    if [[ $postgresqlResult == "E" || $postgresqlResult == "e"  ]]
+    then
+        echo -e "Postgresql Ekleniyor ... " 
+         # Geri Sayım
+        sudo ./countdown.sh
+        sudo ufw allow 5432
+
+        sleep 2
+        # sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
+        echo -e "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main " | sudo tee --append /etc/apt/sources.list.d/pgdg.list
+        sudo wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add -
+        sudo apt-get -y install postgresql postgresql-contrib
+
+        sleep 2
+        echo -e "######Postgresql Enable"
+        sudo systemctl enable postgresql
+
+        sleep 2
+        echo -e "Postgresql Start"
+        sudo systemctl start postgresql
+
+        # PostgreSQL için kullanılacak yeni parola
+        NEW_PASSWORD="sonarqube"
+        # PostgreSQL kullanıcısının parolasını değiştirme
+        sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD '$NEW_PASSWORD';"
+
+        # Parolanın değiştirildiğini doğrulama
+        RESULT=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='postgres' AND rolpassword IS NOT NULL;")
+
+        if [ "$RESULT" == "1" ]; then
+            echo "PostgreSQL kullanıcısının parolası başarıyla değiştirildi."
+        else
+            echo "PostgreSQL kullanıcısının parolası değiştirilemedi."
+        fi
+
+        su - postgres
+        createuser sonar
+        psql
+        ALTER USER sonar WITH ENCRYPTED password 'sonar';
+        CREATE DATABASE sonarqube OWNER sonar;
+        grant all privileges on DATABASE sonarqube to sonar;
+        \q
+        exit
+
+        sleep 2
+        echo -e "5432 PORT"
+        sudo netstat -ntlp | grep 5432
+        sudo netstat -nlptu
+        
+        # Geri Sayım
+        sudo ./countdown.sh
+      
+    else
+        echo -e "Postgresql Kurulumu Yapılmadı!!!\n "   
+    fi
+}
+postgresql
+
+###################################################################
+###################################################################
+# Psotgresql Packet Install
+sonarqube(){
+   
+    echo -e "\n### ${SONARQUBE} Kurulumu ###"
+    read -p "\nSonarQube İstiyor musunuz ? E/H? " sonarqubeResult
+    if [[ $sonarqubeResult == "E" || $sonarqubeResult == "e"  ]]
+    then
+        echo -e "SonarQube Ekleniyor ... " 
+         # Geri Sayım
+        sudo ./countdown.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        sudo ufw allow 9000
+
+        sleep 2
+        sysctl -w vm.max_map_count=524288
+        sysctl -w fs.file-max=131072
+        ulimit -n 131072
+        ulimit -u 8192
+
+        sleep 2
+        #echo -e "#SonarQube Home\nsonarqube   -   nofile   65536\nsonarqube   -   nproc    4096  " >> /etc/security/limits.conf
+        echo -e "#SonarQube Home\nsonarqube   -   nofile   65536\nsonarqube   -   nproc    4096  " | sudo tee --append /etc/security/limits.conf
+
+        sudo apt install build-essential wget zip unzip -y
+
+        cd /tmp
+        sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.0.65466.zip
+        sudo unzip sonarqube-9.9.0.65466.zip -d /opt
+        sudo mv /opt/sonarqube-9.9.0.65466 /opt/sonarqube
+        sudo groupadd sonar
+        sudo useradd -c "user to run SonarQube" -d /opt/sonarqube -g sonar sonar 
+        sudo chown sonar:sonar /opt/sonarqube -R
+        echo -e "### Sonar Config Yükleme Başlandı... "
+        echo -e "#SonarQube Config" | sudo tee --append /opt/sonarqube/conf/sonar.properties
+        echo -e "sonar.jdbc.username=sonar" | sudo tee --append /opt/sonarqube/conf/sonar.properties
+        echo -e "sonar.jdbc.password=sonarqube" | sudo tee --append /opt/sonarqube/conf/sonar.properties
+        echo -e "sonar.jdbc.url=jdbc:postgresql://localhost:5432/sonarqube" | sudo tee --append /opt/sonarqube/conf/sonar.properties
+        echo -e "sonar.web.port=9000 " | sudo tee --append /opt/sonarqube/conf/sonar.properties
+        echo -e "#sonar.web.host=127.0.0.1 " | sudo tee --append /opt/sonarqube/conf/sonar.properties
+        echo -e "#sonar.web.context=/sonar" | sudo tee --append /opt/sonarqube/conf/sonar.properties
+        echo -e "RUN_AS_USER=sonar" | sudo tee --append /opt/sonarqube/bin/linux-x86-64/sonar.sh
+
+        echo -e "#my special Sonar" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "[Unit]" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "Description=SonarQube service" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "After=syslog.target network.target" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "[Service]" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "Type=forking" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "ExecStart=/opt/sonarqube/bin/linux-x86-64/sonar.sh start" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "User=sonar" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "Group=sonar" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "Restart=always" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "LimitNOFILE=65536" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "LimitNPROC=4096" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "[Install]" | sudo tee --append /etc/systemd/system/sonar.service
+        echo -e "WantedBy=multi-user.target" | sudo tee --append /etc/systemd/system/sonar.service
+
+        echo -e "Bağımlılıklar Yükleniyor"
+        sudo apt install –f 
+
+        echo -e "### Sudo su sonar başladı... ################################ "
+        # sudo su sonar
+        # echo -e "./sonar.sh start" | sudo tee --append /opt/sonarqube/bin/linux-x86-64
+        # echo -e "./sonar.sh status" | sudo tee --append /opt/sonarqube/bin/linux-x86-64
+        # echo -e "tail" | sudo tee --append /opt/sonarqube/logs/sonar.log
+        # echo -e "./sonar.sh stop" | sudo tee --append /opt/sonarqube/bin/linux-x86-64
+        # exit
+        sudo su sonar
+
+        cd /opt/sonarqube/bin/linux-x86-64/
+        ./sonar.sh start
+        ./sonar.sh status
+        tail /opt/sonarqube/logs/sonar.log
+        cd /opt/sonarqube/bin/linux-x86-64/
+        ./sonar.sh stop
+        exit
+
+        # bunu yazmazsan çalışmaz
+        sudo sysctl -w vm.max_map_count=262144
+        sysctl vm.max_map_count
+        sudo netstat -ntlp | grep 9000
+        #journalctl -u sonar
+
+        echo -e "### systemctl daemon-reload ################################ "
+        sudo systemctl daemon-reload
+        sudo systemctl enable sonar
+        sudo systemctl start sonar
+        sudo systemctl restart sonar
+        
+        # Geri Sayım
+        sudo ./countdown.sh
+      
+    else
+        echo -e "SonarQube Kurulumu Yapılmadı!!!\n "   
+    fi
+}
+sonarqube
+
 
 ###################################################################
 ###################################################################
