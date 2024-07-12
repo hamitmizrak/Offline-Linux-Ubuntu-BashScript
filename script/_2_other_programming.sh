@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Genel Kurulumlar"
+echo "Other Programming "
 
 # User Variable
 UPDATED="Güncelleme"
@@ -448,7 +448,7 @@ mavenInstall
 ###################################################################
 ###################################################################
 # JENKINS Packet Install
-
+# http://localhost:3333
 # Jenkins Delete
 jenkinsDelete() {
      # Güncelleme Fonksiyonu
@@ -493,7 +493,7 @@ jenkinsDelete() {
         # VSCODE Check Package dependency Fonksiyonunu çağır
         check_package
     else
-        echo -e "Maven Yüklenmesi Yapılmadı...."
+        echo -e "Jenkins Silme İşlemi Yapılmadı...."
     fi
 }
 
@@ -547,8 +547,7 @@ jenkinsInstall() {
         sudo systemctl start jenkins
         sudo systemctl restart jenkins
         # sudo systemctl stop jenkins
-        sudo systemctl status jenkins
-        sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+        sudo systemctl status Jenkins
 
          # Geri Sayım
         sudo ./countdown.sh
@@ -574,7 +573,7 @@ jenkinsInstall() {
         # VSCODE Check Package dependency Fonksiyonunu çağır
         check_package
     else
-        echo -e "Maven Yüklenmesi Yapılmadı...."
+        echo -e "Jenkins Yüklenmesi Yapılmadı...."
     fi
 }
 jenkinsInstall
@@ -585,7 +584,7 @@ jenkinsDelete
 ###################################################################
 ###################################################################
 # Apache Tomcat Packet Install
-
+# http://localhost:4444
 # Tomcat Delete
 apacheTomcatDelete() {
      # Güncelleme Fonksiyonu
@@ -731,189 +730,6 @@ apacheTomcatInstall
 
 # Tomcat Silmek
 apacheTomcatDelete
-
-
-
-###################################################################
-###################################################################
-# Psotgresql Packet Install
-postgresql(){
-   
-    echo -e "\n### ${POSTGRESQL} Kurulumu ###"
-    read -p "\nPostgresql Eklemek İstiyor musunuz ? E/H? " postgresqlResult
-    if [[ $postgresqlResult == "E" || $postgresqlResult == "e"  ]]
-    then
-        echo -e "Postgresql Ekleniyor ... " 
-         # Geri Sayım
-        sudo ./countdown.sh
-        sudo ufw allow 5432
-
-        sleep 2
-        # sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
-        echo -e "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main " | sudo tee --append /etc/apt/sources.list.d/pgdg.list
-        sudo wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add -
-        sudo apt-get -y install postgresql postgresql-contrib
-
-        sleep 2
-        echo -e "######Postgresql Enable"
-        sudo systemctl enable postgresql
-
-        sleep 2
-        echo -e "Postgresql Start"
-        sudo systemctl start postgresql
-
-        # PostgreSQL için kullanılacak yeni parola
-        NEW_PASSWORD="sonarqube"
-        # PostgreSQL kullanıcısının parolasını değiştirme
-        sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD '$NEW_PASSWORD';"
-
-        # Parolanın değiştirildiğini doğrulama
-        RESULT=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='postgres' AND rolpassword IS NOT NULL;")
-
-        if [ "$RESULT" == "1" ]; then
-            echo "PostgreSQL kullanıcısının parolası başarıyla değiştirildi."
-        else
-            echo "PostgreSQL kullanıcısının parolası değiştirilemedi."
-        fi
-
-        su - postgres
-        createuser sonar
-        psql
-        ALTER USER sonar WITH ENCRYPTED password 'sonar';
-        CREATE DATABASE sonarqube OWNER sonar;
-        grant all privileges on DATABASE sonarqube to sonar;
-        \q
-        exit
-
-        sleep 2
-        echo -e "5432 PORT"
-        sudo netstat -ntlp | grep 5432
-        sudo netstat -nlptu
-        
-        # Geri Sayım
-        sudo ./countdown.sh
-      
-    else
-        echo -e "Postgresql Kurulumu Yapılmadı!!!\n "   
-    fi
-}
-postgresql
-
-###################################################################
-###################################################################
-# Psotgresql Packet Install
-sonarqube(){
-   
-    echo -e "\n### ${SONARQUBE} Kurulumu ###"
-    read -p "\nSonarQube İstiyor musunuz ? E/H? " sonarqubeResult
-    if [[ $sonarqubeResult == "E" || $sonarqubeResult == "e"  ]]
-    then
-        echo -e "SonarQube Ekleniyor ... " 
-         # Geri Sayım
-        sudo ./countdown.sh
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        sudo ufw allow 9000
-
-        sleep 2
-        sysctl -w vm.max_map_count=524288
-        sysctl -w fs.file-max=131072
-        ulimit -n 131072
-        ulimit -u 8192
-
-        sleep 2
-        #echo -e "#SonarQube Home\nsonarqube   -   nofile   65536\nsonarqube   -   nproc    4096  " >> /etc/security/limits.conf
-        echo -e "#SonarQube Home\nsonarqube   -   nofile   65536\nsonarqube   -   nproc    4096  " | sudo tee --append /etc/security/limits.conf
-
-        sudo apt install build-essential wget zip unzip -y
-
-        cd /tmp
-        sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.0.65466.zip
-        sudo unzip sonarqube-9.9.0.65466.zip -d /opt
-        sudo mv /opt/sonarqube-9.9.0.65466 /opt/sonarqube
-        sudo groupadd sonar
-        sudo useradd -c "user to run SonarQube" -d /opt/sonarqube -g sonar sonar 
-        sudo chown sonar:sonar /opt/sonarqube -R
-        echo -e "### Sonar Config Yükleme Başlandı... "
-        echo -e "#SonarQube Config" | sudo tee --append /opt/sonarqube/conf/sonar.properties
-        echo -e "sonar.jdbc.username=sonar" | sudo tee --append /opt/sonarqube/conf/sonar.properties
-        echo -e "sonar.jdbc.password=sonarqube" | sudo tee --append /opt/sonarqube/conf/sonar.properties
-        echo -e "sonar.jdbc.url=jdbc:postgresql://localhost:5432/sonarqube" | sudo tee --append /opt/sonarqube/conf/sonar.properties
-        echo -e "sonar.web.port=9000 " | sudo tee --append /opt/sonarqube/conf/sonar.properties
-        echo -e "#sonar.web.host=127.0.0.1 " | sudo tee --append /opt/sonarqube/conf/sonar.properties
-        echo -e "#sonar.web.context=/sonar" | sudo tee --append /opt/sonarqube/conf/sonar.properties
-        echo -e "RUN_AS_USER=sonar" | sudo tee --append /opt/sonarqube/bin/linux-x86-64/sonar.sh
-
-        echo -e "#my special Sonar" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "[Unit]" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "Description=SonarQube service" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "After=syslog.target network.target" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "[Service]" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "Type=forking" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "ExecStart=/opt/sonarqube/bin/linux-x86-64/sonar.sh start" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "User=sonar" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "Group=sonar" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "Restart=always" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "LimitNOFILE=65536" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "LimitNPROC=4096" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "[Install]" | sudo tee --append /etc/systemd/system/sonar.service
-        echo -e "WantedBy=multi-user.target" | sudo tee --append /etc/systemd/system/sonar.service
-
-        echo -e "Bağımlılıklar Yükleniyor"
-        sudo apt install –f 
-
-        echo -e "### Sudo su sonar başladı... ################################ "
-        # sudo su sonar
-        # echo -e "./sonar.sh start" | sudo tee --append /opt/sonarqube/bin/linux-x86-64
-        # echo -e "./sonar.sh status" | sudo tee --append /opt/sonarqube/bin/linux-x86-64
-        # echo -e "tail" | sudo tee --append /opt/sonarqube/logs/sonar.log
-        # echo -e "./sonar.sh stop" | sudo tee --append /opt/sonarqube/bin/linux-x86-64
-        # exit
-        sudo su sonar
-
-        cd /opt/sonarqube/bin/linux-x86-64/
-        ./sonar.sh start
-        ./sonar.sh status
-        tail /opt/sonarqube/logs/sonar.log
-        cd /opt/sonarqube/bin/linux-x86-64/
-        ./sonar.sh stop
-        exit
-
-        # bunu yazmazsan çalışmaz
-        sudo sysctl -w vm.max_map_count=262144
-        sysctl vm.max_map_count
-        sudo netstat -ntlp | grep 9000
-        #journalctl -u sonar
-
-        echo -e "### systemctl daemon-reload ################################ "
-        sudo systemctl daemon-reload
-        sudo systemctl enable sonar
-        sudo systemctl start sonar
-        sudo systemctl restart sonar
-        
-        # Geri Sayım
-        sudo ./countdown.sh
-      
-    else
-        echo -e "SonarQube Kurulumu Yapılmadı!!!\n "   
-    fi
-}
-sonarqube
 
 
 ###################################################################
@@ -1190,6 +1006,11 @@ dockerInstall() {
         # Docker Pulling
         dockerPulling
 
+        # Apache Tomcat 
+        docker run -d --name my_tomcat1 -p  1111:8080 tomcat:9.0.8-jre8-alpine
+        docker ps 
+        # docker container exec -it my_tomcat1 bash
+
         # DockerHub Login 
         dockerHubLogin
 
@@ -1219,6 +1040,91 @@ dockerInstall() {
     fi
 }
 dockerInstall
+
+
+###################################################################
+###################################################################
+# Postgresql Packet Install
+postgresql(){
+   
+    echo -e "\n### ${POSTGRESQL} Kurulumu ###"
+    read -p "\nPostgresql Eklemek İstiyor musunuz ? E/H? " postgresqlResult
+    if [[ $postgresqlResult == "E" || $postgresqlResult == "e"  ]]
+    then
+        echo -e "Postgresql Ekleniyor ... " 
+         # Geri Sayım
+        sudo ./countdown.sh
+        sudo ufw allow 5432
+
+        sleep 2
+        # sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
+        echo -e "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main " | sudo tee --append /etc/apt/sources.list.d/pgdg.list
+        sudo wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add -
+        sudo apt-get -y install postgresql postgresql-contrib
+
+        sleep 2
+        echo -e "######Postgresql Enable"
+        sudo systemctl enable postgresql
+
+        sleep 2
+        echo -e "Postgresql Start"
+        sudo systemctl start postgresql
+
+        # PostgreSQL için kullanılacak yeni parola
+        NEW_PASSWORD="sonarqube"
+        # PostgreSQL kullanıcısının parolasını değiştirme
+        sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD '$NEW_PASSWORD';"
+
+        # Parolanın değiştirildiğini doğrulama
+        RESULT=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='postgres' AND rolpassword IS NOT NULL;")
+
+        if [ "$RESULT" == "1" ]; then
+            echo "PostgreSQL kullanıcısının parolası başarıyla değiştirildi."
+        else
+            echo "PostgreSQL kullanıcısının parolası değiştirilemedi."
+        fi
+
+        su - postgres
+        createuser sonar
+        psql
+        ALTER USER sonar WITH ENCRYPTED password 'sonar';
+        CREATE DATABASE sonarqube OWNER sonar;
+        grant all privileges on DATABASE sonarqube to sonar;
+        \q
+        exit
+
+        sleep 2
+        echo -e "5432 PORT"
+        sudo netstat -ntlp | grep 5432
+        sudo netstat -nlptu
+        
+        # Geri Sayım
+        sudo ./countdown.sh
+      
+    else
+        echo -e "Postgresql Kurulumu Yapılmadı!!!\n "   
+    fi
+}
+postgresql
+
+###################################################################
+###################################################################
+# Psotgresql Packet Install
+sonarqube(){
+   
+    echo -e "\n### ${SONARQUBE} Kurulumu ###"
+    read -p "\nSonarQube İstiyor musunuz ? E/H? " sonarqubeResult
+    if [[ $sonarqubeResult == "E" || $sonarqubeResult == "e"  ]]
+    then
+        echo -e "SonarQube Ekleniyor ... " 
+         # Geri Sayım
+        sudo ./countdown.sh
+      
+    else
+        echo -e "SonarQube Kurulumu Yapılmadı!!!\n "   
+    fi
+}
+sonarqube
 
 ###################################################################
 ###################################################################
